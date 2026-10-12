@@ -49,6 +49,6 @@ npm audit --audit-level=moderate
 
 Use `npx wrangler dev` with local-only `ACCESS_MODE="key"` and `API_KEY="your-local-password"` in ignored `.dev.vars`. These are self-hosting settings; hosted users do not need an issued API key. Configure `SOLANA_RPC_URL` and optional `JUPITER_API_KEY` as Worker secrets through secure stdin. Never commit credentials or wallet keys.
 
-The default public Solana RPC has shared limits and can return 503. Cloudflare free CPU/request limits are shared with the owner's other Workers; no reserved capacity or latency SLA is offered. End-to-end build latency includes RPC and mandatory simulation. Confirmation latency additionally depends on your signing, RPC submission, priority fee and network conditions. No funded hosting upgrade is enabled.
+The hosted API uses an existing Helius project through a protected Worker secret; its quota is shared between these new Solana services. The default public Solana RPC is for development and can return 503 under shared limits. Cloudflare free CPU/request limits are shared with the owner's other Workers; no reserved capacity or latency SLA is offered. End-to-end build latency includes RPC and mandatory simulation. Confirmation latency additionally depends on your signing, RPC submission, priority fee and network conditions. No funded hosting upgrade is enabled.
 
 The SDKs are used offline to generate fixed account layouts. After a protocol change, regenerate them, review the official source and route IDL, run tests and repeat read-only simulations. This API has no RapidAPI association.
