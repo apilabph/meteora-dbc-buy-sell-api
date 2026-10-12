@@ -11,3 +11,7 @@ Deployment: public GitHub repository and https://meteora-dbc-trade.apilabph.work
 The default public RPC returned rate-limit errors from Cloudflare, although it worked locally. Production now uses SOLANA_RPC_URL as a protected Worker secret. Its credential and local source file are not in GitHub. No paid upgrade was made. See [hosted evidence](evidence/hosted-mainnet.json).
 
 Limits: no funded trade tests or independent security audit. Local build measurements are isolated samples, not a latency SLA or confirmation benchmark. Fresh tokens can be absent from Jupiter, and historical migration configurations outside the supported set are rejected.
+
+Clean-install correction: the local bigint adapter is now a direct dependency with a root-relative npm override. Node 22/24 [CI passed](https://github.com/apilabph/meteora-dbc-buy-sell-api/actions/runs/38307546646). Latest Worker deployment after this packaging fix: c9d5cc86-9873-481d-a22a-260d16892f8e. Runtime bundle size is unchanged.
+
+Final hosted readback after the packaging correction passed an unsigned buy simulation: [evidence](evidence/hosted-packaging-release.json).

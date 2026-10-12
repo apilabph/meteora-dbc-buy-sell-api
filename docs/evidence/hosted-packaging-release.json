@@ -1,0 +1,17 @@
+{
+  "verifiedAt": "2026-10-12T21:10:00.741Z",
+  "host": "https://meteora-dbc-trade.apilabph.workers.dev",
+  "httpStatus": 200,
+  "action": "buy",
+  "stage": "meteora-damm-v2",
+  "simulation": {
+    "status": "passed",
+    "contextSlot": 456189629,
+    "unitsConsumed": 70507,
+    "signatureVerification": false,
+    "serviceFeeLamports": "250"
+  },
+  "roundTripMs": 831,
+  "signed": false,
+  "submitted": false
+}
