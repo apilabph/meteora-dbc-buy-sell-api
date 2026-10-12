@@ -7,6 +7,7 @@ workers_dev = true
 enabled = false
 [vars]
 ACCESS_MODE = "public"
+SOLANA_RPC_URL = "https://solana-rpc.publicnode.com"
 [[ratelimits]]
 name = "PUBLIC_RATE_LIMITER"
 namespace_id = "2026101305"
