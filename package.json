@@ -16,11 +16,12 @@
     "@solana/web3.js": "1.98.4",
     "@solana/spl-token": "0.4.14",
     "bs58": "6.0.0",
-    "bn.js": "5.2.5"
+    "bn.js": "5.2.5",
+    "bigint-buffer": "file:vendor/bigint-buffer"
   },
   "overrides": {
     "bn.js": "5.2.5",
-    "bigint-buffer": "file:vendor/bigint-buffer",
+    "bigint-buffer": "$bigint-buffer",
     "jayson": "5.0.0",
     "toml": "5.0.0",
     "uuid": "11.1.1"

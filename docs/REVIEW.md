@@ -7,3 +7,5 @@ Review found and fixed a route-handler shape mismatch inherited during integrati
 Limits: official protocol programs and RPCs remain trust dependencies. Protocol upgrades can break the allowlist. This is internal code review, not an independent audit. Public test results do not replace funded testing.
 
 Live checks also corrected the DBC aggregator label and validated legacy LaunchLab migrations using CPMM config 0 with the LaunchLab program-derived pool creator. A platform changing its preferred config must not make an unrelated pool trusted.
+
+Clean-install CI found npm resolving a transitive file override relative to buffer-layout-utils instead of the repository. Fixed by declaring the local bigint-buffer adapter as a direct dependency and referencing it through npm's $bigint-buffer override. Fresh npm ci, all 14 tests, syntax/spec checks and a zero-vulnerability audit passed locally. Remote CI verifies the Linux Node 22/24 installs after push.
