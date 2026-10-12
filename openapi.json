@@ -1,0 +1,253 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Meteora DBC Buy and Sell API",
+    "version": "0.1.0-beta",
+    "description": "Unsigned trading beta. Local signing. 25-bps fee. No funded trade verification."
+  },
+  "servers": [
+    {
+      "url": "https://meteora-dbc-trade.apilabph.workers.dev"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Liveness only",
+        "responses": {
+          "200": {
+            "description": "Process is responding; not proof of RPC or trading availability."
+          }
+        }
+      }
+    },
+    "/api/capabilities": {
+      "get": {
+        "summary": "Scope and fee configuration",
+        "responses": {
+          "200": {
+            "description": "Capabilities"
+          }
+        }
+      }
+    },
+    "/api/quote": {
+      "post": {
+        "summary": "Get an unsimulated estimate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "publicKey",
+                  "mint",
+                  "action",
+                  "amount",
+                  "market"
+                ],
+                "properties": {
+                  "publicKey": {
+                    "type": "string",
+                    "description": "Public Solana signing wallet. Never send a private key."
+                  },
+                  "mint": {
+                    "type": "string"
+                  },
+                  "market": {
+                    "type": "string",
+                    "description": "Original curve address; required for Meteora."
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "buy",
+                      "sell"
+                    ]
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "Buy: decimal SOL. Sell: raw integer token units."
+                  },
+                  "slippageBps": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5000,
+                    "default": 100
+                  },
+                  "priorityFee": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000000,
+                    "default": 0,
+                    "description": "Total priority fee cap in lamports."
+                  },
+                  "maxServiceFeeBps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "simulate": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Must be true for /api/trade."
+                  },
+                  "pool": {
+                    "type": "string",
+                    "enum": [
+                      "auto"
+                    ],
+                    "default": "auto"
+                  }
+                }
+              },
+              "example": {
+                "publicKey": "YOUR_PUBLIC_WALLET",
+                "mint": "TOKEN_MINT",
+                "market": "ORIGINAL_DBC_CURVE_ADDRESS",
+                "action": "buy",
+                "amount": "0.01",
+                "slippageBps": 100,
+                "maxServiceFeeBps": 25
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Unsimulated estimate"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "409": {
+            "description": "Fee ceiling or migration/stage change"
+          },
+          "422": {
+            "description": "Unsupported state, insufficient funds or simulation failure"
+          },
+          "429": {
+            "description": "Rate limited"
+          },
+          "502": {
+            "description": "Upstream route failed audit"
+          },
+          "503": {
+            "description": "RPC or route unavailable"
+          }
+        }
+      }
+    },
+    "/api/trade": {
+      "post": {
+        "summary": "Build and simulate an unsigned transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "publicKey",
+                  "mint",
+                  "action",
+                  "amount",
+                  "market"
+                ],
+                "properties": {
+                  "publicKey": {
+                    "type": "string",
+                    "description": "Public Solana signing wallet. Never send a private key."
+                  },
+                  "mint": {
+                    "type": "string"
+                  },
+                  "market": {
+                    "type": "string",
+                    "description": "Original curve address; required for Meteora."
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "buy",
+                      "sell"
+                    ]
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "Buy: decimal SOL. Sell: raw integer token units."
+                  },
+                  "slippageBps": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5000,
+                    "default": 100
+                  },
+                  "priorityFee": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000000,
+                    "default": 0,
+                    "description": "Total priority fee cap in lamports."
+                  },
+                  "maxServiceFeeBps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "simulate": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Must be true for /api/trade."
+                  },
+                  "pool": {
+                    "type": "string",
+                    "enum": [
+                      "auto"
+                    ],
+                    "default": "auto"
+                  }
+                }
+              },
+              "example": {
+                "publicKey": "YOUR_PUBLIC_WALLET",
+                "mint": "TOKEN_MINT",
+                "market": "ORIGINAL_DBC_CURVE_ADDRESS",
+                "action": "buy",
+                "amount": "0.01",
+                "slippageBps": 100,
+                "maxServiceFeeBps": 25
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Unsigned transaction, amounts, fees, rent and simulation result"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "409": {
+            "description": "Fee ceiling or migration/stage change"
+          },
+          "422": {
+            "description": "Unsupported state, insufficient funds or simulation failure"
+          },
+          "429": {
+            "description": "Rate limited"
+          },
+          "502": {
+            "description": "Upstream route failed audit"
+          },
+          "503": {
+            "description": "RPC or route unavailable"
+          }
+        }
+      }
+    }
+  }
+}

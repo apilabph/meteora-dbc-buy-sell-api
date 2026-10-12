@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-13",
+  "mode": "unsigned simulation only",
+  "rows": [
+    {
+      "observedAt": "2026-10-12T20:11:34.103Z",
+      "venue": "meteora-dbc",
+      "action": "buy",
+      "mint": "3TEVUwXx8R4mPrESKSr9S3gbDCmkbHj2jAPMFEpd1537",
+      "contextSlot": 456173576,
+      "unitsConsumed": 86126,
+      "serviceFeeLamports": "250",
+      "transactionBytes": 881,
+      "submitted": false
+    },
+    {
+      "observedAt": "2026-10-12T20:14:05.479Z",
+      "venue": "meteora-damm-v2",
+      "action": "buy",
+      "mint": "6Mix12LiHrQFojaQEnfPUC65Qkwd6X4Y5Qg93oFbordr",
+      "contextSlot": 456174286,
+      "unitsConsumed": 68948,
+      "serviceFeeLamports": "250",
+      "transactionBytes": 634,
+      "submitted": false
+    },
+    {
+      "observedAt": "2026-10-12T20:15:21.377Z",
+      "venue": "meteora-damm-v2",
+      "action": "sell",
+      "mint": "3TEVUwXx8R4mPrESKSr9S3gbDCmkbHj2jAPMFEpd1537",
+      "contextSlot": 456174628,
+      "unitsConsumed": 48263,
+      "serviceFeeLamports": "1",
+      "transactionBytes": 698,
+      "submitted": false,
+      "localBuildLatencyMs": 603
+    }
+  ]
+}

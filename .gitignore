@@ -1,0 +1,8 @@
+node_modules/
+.dev.vars*
+.env*
+.wrangler/
+research/
+*.log
+*keypair*
+.trade-journal/

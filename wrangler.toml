@@ -1,0 +1,17 @@
+name = "meteora-dbc-trade"
+main = "src/worker.js"
+compatibility_date = "2026-10-12"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+[observability]
+enabled = false
+[vars]
+ACCESS_MODE = "public"
+[[ratelimits]]
+name = "PUBLIC_RATE_LIMITER"
+namespace_id = "2026101305"
+simple = { limit = 6, period = 60 }
+[[ratelimits]]
+name = "PUBLIC_TOTAL_LIMITER"
+namespace_id = "2026101306"
+simple = { limit = 20, period = 60 }
