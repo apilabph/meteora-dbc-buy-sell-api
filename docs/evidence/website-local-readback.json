@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-13T05:32:34.688Z",
+  "mode": "read-only through local preview proxy",
+  "results": [
+    {
+      "api": "meteora-dbc",
+      "path": "/api/capabilities",
+      "status": 200,
+      "ms": 174
+    }
+  ]
+}

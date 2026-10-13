@@ -15,3 +15,7 @@ Limits: no funded trade tests or independent security audit. Local build measure
 Clean-install correction: the local bigint adapter is now a direct dependency with a root-relative npm override. Node 22/24 [CI passed](https://github.com/apilabph/meteora-dbc-buy-sell-api/actions/runs/38307546646). Latest Worker deployment after this packaging fix: c9d5cc86-9873-481d-a22a-260d16892f8e. Runtime bundle size is unchanged.
 
 Final hosted readback after the packaging correction passed an unsigned buy simulation: [evidence](evidence/hosted-packaging-release.json).
+
+## Developer website — local review, October 13, 2026
+
+Added a separate, responsive developer website under website/. It is committed for local review, with no deployment or custom domain change. See [website guide](WEBSITE.md) for local startup, screenshots, tests and the production integration still needed. Existing on-chain readiness and funded-test limitations remain in force.

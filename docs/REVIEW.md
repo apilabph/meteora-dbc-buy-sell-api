@@ -9,3 +9,7 @@ Limits: official protocol programs and RPCs remain trust dependencies. Protocol 
 Live checks also corrected the DBC aggregator label and validated legacy LaunchLab migrations using CPMM config 0 with the LaunchLab program-derived pool creator. A platform changing its preferred config must not make an unrelated pool trusted.
 
 Clean-install CI found npm resolving a transitive file override relative to buffer-layout-utils instead of the repository. Fixed by declaring the local bigint-buffer adapter as a direct dependency and referencing it through npm's $bigint-buffer override. Fresh npm ci, all 14 tests, syntax/spec checks and a zero-vulnerability audit passed locally. Remote CI verifies the Linux Node 22/24 installs after push.
+
+## Local website review — October 13, 2026
+
+Reviewed the separate website, generated request examples and loopback-only preview server. Fixed zero slippage being silently replaced with the default. Public inputs stay text in the DOM and generated JavaScript; POSIX cURL values are shell-quoted. Preview requests reject private/unknown fields, incomplete quote bodies, foreign origins/hosts, oversized inputs and every transaction/build/approval endpoint. Only pinned-origin reads are forwarded; credentials are not forwarded. Clarified quote versus simulation versus submission, request timing versus confirmation, and funded-trade readiness. Browser QA uses mocked UI cases; actual read-only checks are separate. No contract or trading behavior changed.
