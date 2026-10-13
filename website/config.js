@@ -7,10 +7,10 @@ export const config = {
   native: "SOL",
   evm: false,
   needsMarket: true,
-  accent: "#c9b6ff",
+  accent: "#f8824e",
   port: 8811,
   fee: "DYjod9qNZvNu93yhdEw7pnASdt8FdghQF5WhEU7CgEXj",
-  hero: "From the curve<br>to the pool.<br><span>Keep your keys.</span>",
+  hero: "Buy and Sell Meteora DBC API",
   lead: "Build Meteora DBC buy and sell transactions with the current trading stage, a minimum output and your own local signer.",
   status:
     "Unsigned builds are available in beta. Read-only mainnet simulations passed; funded buys and sells have not been tested.",
