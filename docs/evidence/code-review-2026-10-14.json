@@ -1,0 +1,46 @@
+{
+  "reviewDate": "2026-10-14",
+  "checkedAt": "2026-10-13T16:38:27.920Z",
+  "repository": "https://github.com/apilabph/meteora-dbc-buy-sell-api",
+  "baseCommit": "927fec2fec3538309feaf61a48b41ff640de75b2",
+  "node": "v24.18.0",
+  "testCount": 29,
+  "results": [
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "durationMs": 6356,
+      "logSha256": "e235fd832e487a3f6a94a1d4e857a901324c22af4618c89c0e2d3532af4dae3a"
+    },
+    {
+      "command": "npm run check",
+      "exitCode": 0,
+      "durationMs": 7432,
+      "logSha256": "c2c9daefea07fcabe632e416037af9127886371de5fe569958d5c57d8af92924"
+    },
+    {
+      "command": "npm run build:check",
+      "exitCode": 0,
+      "durationMs": 14051,
+      "logSha256": "e474e1065d9c1b93f2bda036dd0c0eb28ff416bd8d6e495b8d58c51cc29cfb0c"
+    },
+    {
+      "command": "npm audit --audit-level=moderate",
+      "exitCode": 0,
+      "durationMs": 4391,
+      "logSha256": "6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "durationMs": 212,
+      "logSha256": "e458541ad4f1938c7ac3ebd9b0c65953051be5bd9df693cb653ae22f952753d3"
+    }
+  ],
+  "scope": "Internal source review and offline regression/contract-fixture checks. No live chain request, wallet access, transaction signing/broadcast, funded trade or Worker deployment.",
+  "compatibility": "Executable token-mint accounts rejected.",
+  "customerRpcOnly": true,
+  "rapidApiChanged": false,
+  "contractBytecodeChanged": false,
+  "fundedTradingVerified": false
+}
