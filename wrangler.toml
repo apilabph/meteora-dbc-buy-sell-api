@@ -6,6 +6,7 @@ workers_dev = true
 [observability]
 enabled = false
 [vars]
+RPC_MODE = "customer"
 ACCESS_MODE = "public"
 [[ratelimits]]
 name = "PUBLIC_RATE_LIMITER"

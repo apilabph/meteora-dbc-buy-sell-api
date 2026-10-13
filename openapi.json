@@ -3,11 +3,12 @@
   "info": {
     "title": "Meteora DBC Buy and Sell API",
     "version": "0.1.0-beta",
-    "description": "Unsigned trading beta. Local signing. 25-bps fee. No funded trade verification."
+    "description": "Runs locally with the customer RPC for all chain reads and unsigned transaction preparation. Hosted chain endpoints have been retired with HTTP 410 CUSTOMER_RPC_REQUIRED. See docs/CUSTOMER-RPC.md. Unsigned trading beta. Local signing. 25-bps fee. No funded trade verification."
   },
   "servers": [
     {
-      "url": "https://meteora-dbc-trade.apilabph.workers.dev"
+      "url": "http://127.0.0.1:8787",
+      "description": "Customer-run local API; CUSTOMER_RPC_URL is required in its environment."
     }
   ],
   "paths": {
@@ -249,5 +250,6 @@
         }
       }
     }
-  }
+  },
+  "x-rpc-mode": "customer"
 }

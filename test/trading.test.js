@@ -51,7 +51,7 @@ test('migration pending and stage changes cannot return a transaction',async()=>
 test('wrong owner, discriminator and destination pool fail validation',async()=>{for(const attack of ['owner','discriminator','destination']){const f=await fixture(true);if(attack==='owner')f.accounts.get(f.curveKey.toBase58()).owner=SystemProgram.programId;if(attack==='discriminator')f.accounts.get(f.curveKey.toBase58()).data[0]^=1;if(attack==='destination')f.accounts.delete(f.state.marketKey.toBase58());await assert.rejects(()=>protocol.inspectState(f.rpc,f.input));}});
 test('simulation and caller fee ceiling are enforced before network work',async()=>{const f=await fixture();for(const body of [{...f.body,simulate:false},{...f.body,maxServiceFeeBps:24},{...f.body,amount:'-1'},{...f.body,privateKey:'never'}])await assert.rejects(()=>jupiterTrade(body,{},true,()=>{throw Error('network must not run');}),e=>['SIMULATION_REQUIRED','FEE_LIMIT_EXCEEDED','INVALID_INPUT'].includes(e.code));});
 test('existing wrapped SOL is preserved and arbitrary upstream setup is ignored',async()=>{const f=await fixture();f.route.setupInstructions=[{programId:SystemProgram.programId.toBase58(),data:'bad'}];const b=composeRoute(auditRoute(f.route,f.input,f.state),f.input,f.state,true,true,OTHER.toBase58(),[]),tx=VersionedTransaction.deserialize(Buffer.from(b.transaction,'base64'));assert.equal(tx.message.compiledInstructions.filter(ix=>tx.message.staticAccountKeys[ix.programIdIndex].equals(TOKEN_PROGRAM_ID)&&ix.data[0]===9).length,0);});
-test('RPC forbids broadcasts and rejects regressed context',async()=>{const rpc=new Rpc({},async()=>new Response(JSON.stringify({jsonrpc:'2.0',id:1,result:{context:{slot:1},value:[]}})));await assert.rejects(()=>rpc.call('sendTransaction',[]),/Forbidden/);rpc.slot=2;rpc.calls=0;await assert.rejects(()=>rpc.accounts([]),e=>e.code==='RPC_UNAVAILABLE');});
+test('RPC forbids broadcasts and rejects regressed context',async()=>{const rpc=new Rpc({SOLANA_RPC_URL:'https://customer.invalid'},async()=>new Response(JSON.stringify({jsonrpc:'2.0',id:1,result:{context:{slot:1},value:[]}})));await assert.rejects(()=>rpc.call('sendTransaction',[]),/Forbidden/);rpc.slot=2;rpc.calls=0;await assert.rejects(()=>rpc.accounts([]),e=>e.code==='RPC_UNAVAILABLE');});
 
 test('verified pool cannot be moved to an unused route account to hide another execution pool',async()=>{
  for(const graduated of [false,true])for(const action of ['buy','sell']){
@@ -68,5 +68,34 @@ test('verified pool cannot be moved to an unused route account to hide another e
    const readOnly=structuredClone(good);readOnly.swapInstruction.accounts[poolIndex].isWritable=false;
    assert.throws(()=>auditRoute(readOnly,f.input,f.state),e=>e.code==='ROUTE_REJECTED');
   }
+ }
+});
+
+test('customer RPC client builds both directions at both stages without an APILabPH request',async()=>{
+ const {createClient}=await import('../client/index.mjs');
+ const rpcUrl='https://customer-rpc.example/?key=customer-rpc-fixture';
+ for(const graduated of [false,true])for(const action of ['buy','sell']){
+  const f=await fixture(graduated,action),seen=[];
+  const client=createClient({rpcUrl,jupiterApiKey:'customer-routing-fixture',fetchImpl:async(url,options)=>{
+   seen.push(String(url));
+   if(new URL(url).hostname==='api.jup.ag'){
+    assert.equal(options.headers['x-api-key'],'customer-routing-fixture');
+    assert.ok(!String(url).includes('customer-rpc-fixture'));
+    return f.fetcher();
+   }
+   assert.equal(url,rpcUrl);assert.equal(options.headers['x-api-key'],undefined);
+   const {id,method,params}=JSON.parse(options.body);let value;
+   if(method==='getMultipleAccounts')value=(await f.rpc.accounts(params[0].map(key=>new PublicKey(key)))).map(a=>a===null?null:{...a,owner:a.owner.toBase58(),data:[a.data.toString('base64'),'base64']});
+   else if(method==='getLatestBlockhash')value=await f.rpc.latestBlockhash();
+   else if(method==='getFeeForMessage')value=await f.rpc.fee(params[0]);
+   else if(method==='simulateTransaction')value=await f.rpc.simulate(params[0]);
+   else throw Error('Unexpected RPC method '+method);
+   return Response.json({jsonrpc:'2.0',id,result:{context:{slot:f.rpc.slot},value}});
+  }});
+  const result=await client.buildTrade({...f.body,maxServiceFeeBps:25});
+  assert.equal(result.simulation.status,'passed');assert.equal(result.submitted,false);assert.equal(result.serviceFeeBps,25);
+  assert.equal(result.feeRecipient,FEE_RECIPIENT.toBase58());
+  assert.ok(seen.some(url=>url===rpcUrl));assert.ok(seen.some(url=>new URL(url).hostname==='api.jup.ag'));
+  assert.ok(!JSON.stringify(result).includes('customer-rpc-fixture'));
  }
 });

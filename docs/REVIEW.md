@@ -1,5 +1,14 @@
 # Review
 
+## Customer RPC migration — October 13, 2026
+
+The customer process now performs chain reads, transaction preparation and simulation through its explicit RPC. The hosted Worker defaults to documentation-only mode and returns HTTP 410 CUSTOMER_RPC_REQUIRED for former chain operations, even if old operator secrets remain. Local signing/submission stays with the bot. The fee rate/recipient and protocol validation are unchanged.
+
+Review fixed implicit public-RPC fallback, stale hosted quickstarts, missing-RPC error handling and browser chain forwarding. 28 automated tests, syntax/specification checks, Worker dry-run and dependency audit passed. The local website passed Edge interaction, six-width layout and sampled contrast checks; it sends no chain requests. [Recorded local evidence](evidence/customer-rpc-local-review.json). No funded trade, settlement deployment or live chain request was performed for this migration.
+
+Customers must follow [the migration guide](CUSTOMER-RPC.md). EVM settlement and funded-trade requirements remain. Code-only website previews remain local. Deployment/readback evidence is recorded separately.
+
+
 The build pipeline audits the bytes and accounts of a single Jupiter route and assembles account setup locally. It does not execute upstream setup instructions. Builds require an unsigned simulation, an exact fee check against the simulation event, and a final migration check. Unexpected protocol state or encodings fail closed.
 
 Review found and fixed a route-handler shape mismatch inherited during integration. Account layouts now validate Anchor discriminators in addition to owners; SDK decoders alone skip some discriminators. Canonical pool identity is derived from the original curve and migration configuration. Unknown migration types are rejected.

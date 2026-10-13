@@ -1,5 +1,7 @@
 # Meteora DBC Buy and Sell API
 
+**Customer RPC mode:** run this API or import its client inside your own bot. All application blockchain RPC work uses your endpoint. Start with [the customer RPC guide](docs/CUSTOMER-RPC.md). The public site serves documentation; hosted trade/quote/market endpoints are retired in this release. Existing funded-test and settlement requirements remain.
+
 Build unsigned buy and sell transactions for Meteora DBC tokens before and after graduation to DAMM V2. Your bot keeps its keys and signs locally. This is an independent integration, not an official Meteora product.
 
 **Beta 0.1.0.** Automated checks cover input, routing and fee safeguards. Funded trades have not been tested. A successful simulation is a point-in-time check, not a guarantee of execution. See [release evidence](docs/RELEASE.md) for the exact deployment and live verification status.
@@ -8,10 +10,10 @@ Build unsigned buy and sell transactions for Meteora DBC tokens before and after
 
 ## Quick start
 
-The hosted public beta requires no API key. Rate limits apply. Install Node 22 or 24 if using the local code.
+First follow [local setup](docs/CUSTOMER-RPC.md): install Node 22 or 24, configure CUSTOMER_RPC_URL in ignored .dev.vars and start `npm run api:local`. No APILabPH API key is required.
 
 ```bash
-curl https://meteora-dbc-trade.apilabph.workers.dev/api/trade \
+curl http://127.0.0.1:8787/api/trade \
   -H "Content-Type: application/json" \
   -d '{"publicKey":"YOUR_PUBLIC_WALLET","mint":"TOKEN_MINT","market":"ORIGINAL_DBC_CURVE_ADDRESS","action":"buy","amount":"0.01","slippageBps":100,"maxServiceFeeBps":25}'
 ```
@@ -47,12 +49,12 @@ npm run build:check
 npm audit --audit-level=moderate
 ```
 
-Use `npx wrangler dev` with local-only `ACCESS_MODE="key"` and `API_KEY="your-local-password"` in ignored `.dev.vars`. These are self-hosting settings; hosted users do not need an issued API key. Configure `SOLANA_RPC_URL` and optional `JUPITER_API_KEY` as Worker secrets through secure stdin. Never commit credentials or wallet keys.
+Run `npm run api:local` with CUSTOMER_RPC_URL and, when required, your own JUPITER_API_KEY in ignored .dev.vars. The local API has no signing endpoint. Never commit provider credentials or wallet keys.
 
-The hosted API uses an existing Helius project through a protected Worker secret; its quota is shared between these new Solana services. The default public Solana RPC is for development and can return 503 under shared limits. Cloudflare free CPU/request limits are shared with the owner's other Workers; no reserved capacity or latency SLA is offered. End-to-end build latency includes RPC and mandatory simulation. Confirmation latency additionally depends on your signing, RPC submission, priority fee and network conditions. No funded hosting upgrade is enabled.
+The public Worker serves documentation and static metadata; chain endpoints return HTTP 410 CUSTOMER_RPC_REQUIRED. Market reads, simulation and trade preparation run in the customer process. Submission and confirmation use the customer’s signer and RPC. Jupiter routing is a separate dependency with its own access limits. Build latency and transaction confirmation are separate measurements; no uptime or speed guarantee is offered.
 
 The SDKs are used offline to generate fixed account layouts. After a protocol change, regenerate them, review the official source and route IDL, run tests and repeat read-only simulations. This API has no RapidAPI association.
 
 ## Separate developer website (local review)
 
-A redesigned website is ready for local review in [website/](website/README.md). Run `npm run site:preview`, then open http://127.0.0.1:8811. It includes a read-only playground, three-language examples, fees, coverage and troubleshooting. Local browser and automated checks are documented in [website verification](docs/WEBSITE.md). The redesign has not been deployed and no custom domain is configured.
+A redesigned website is ready for local review in [website/](website/README.md). Run `npm run site:preview`, then open http://127.0.0.1:8811. It includes a local request-code generator, three-language examples, fees, coverage and troubleshooting. Local browser and automated checks are documented in [website verification](docs/WEBSITE.md). The redesign has not been deployed and no custom domain is configured.
