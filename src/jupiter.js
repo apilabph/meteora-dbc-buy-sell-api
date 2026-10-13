@@ -12,6 +12,10 @@ export const JUPITER_PROGRAM=new PublicKey('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5Q
 const EVENT_AUTHORITY=new PublicKey('D8cy77BBepLMngZx6ZukaTff5hCt1HrWyKk3Hnd9oitf');
 const DISCRIMINATOR=Buffer.from([187,100,250,204,49,196,175,20]);
 const COMPUTE_UNITS=500000;
+// route_v2 starts the single DEX account list at index 12. Pin the pool slot,
+// not mere membership: an unused appended account must not validate another pool.
+// Offsets are checked against the pinned official SDKs and captured mainnet builds.
+const POOL_INDEX_BY_VARIANT={46:15,77:13,78:14,81:16,82:16,88:14,108:13};
 const reject=()=>{throw new ApiError(502,'ROUTE_REJECTED','The upstream route did not pass transaction safety checks. No transaction was submitted.');};
 function uint(value){if(typeof value!=='string'||!/^\d{1,20}$/.test(value)||BigInt(value)>U64_MAX)reject();return BigInt(value);}
 const key=value=>{try{return new PublicKey(value);}catch{reject();}};
@@ -51,7 +55,8 @@ export function auditRoute(route,input,state){
   if(data.readUInt16LE(35+fields)!==10000||data[37+fields]!==0||data[38+fields]!==1)reject();
   const accounts=raw.accounts.map(a=>{if(typeof a.isSigner!=='boolean'||typeof a.isWritable!=='boolean')reject();const pubkey=key(a.pubkey);if(a.isSigner&&!pubkey.equals(input.user))reject();return {...a,pubkey};});
   const expected=[input.user,source,destination,sourceMint,destMint,sourceProgram,destProgram,JUPITER_PROGRAM,EVENT_AUTHORITY,JUPITER_PROGRAM,FEE_ATA,state.programId];
-  if(expected.some((p,i)=>!accounts[i].pubkey.equals(p))||!accounts[0].isSigner||![1,2,10].every(i=>accounts[i].isWritable)||!accounts.slice(12).some(a=>a.pubkey.equals(market)))reject();
+  const poolAccount=accounts[POOL_INDEX_BY_VARIANT[variant]];
+  if(expected.some((p,i)=>!accounts[i].pubkey.equals(p))||!accounts[0].isSigner||![1,2,10].every(i=>accounts[i].isWritable)||!poolAccount?.pubkey.equals(market)||!poolAccount.isWritable)reject();
   if(accounts.filter(a=>a.pubkey.equals(FEE_ATA)).length!==1)reject();
   return {instruction:new TransactionInstruction({programId:JUPITER_PROGRAM,keys:accounts,data}),output,min,variant};
 }

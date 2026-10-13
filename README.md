@@ -23,7 +23,7 @@ To sell, use `"action":"sell","amount":"1000000"`. Sell amounts are **raw token 
 ## What this builder checks
 
 - The current curve stage, canonical destination and mint/program identity before construction, then the stage again after simulation.
-- A single Jupiter route matching the verified market, exact input, minimum output, signer and fee account. Unknown route encodings are rejected.
+- A single Jupiter route matching the verified market at the DEX pool account position, exact input, minimum output, signer and fee account. An expected pool appended as an unused account is rejected, as are unknown route encodings.
 - The service fee in the simulation's own inner transfer and swap event. Concurrent fee deposits cannot distort this check.
 - Existing wrapped-SOL accounts are preserved. If one already exists, sell proceeds remain in wrapped SOL.
 

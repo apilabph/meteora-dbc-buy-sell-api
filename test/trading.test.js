@@ -32,8 +32,11 @@ async function fixture(graduated=false,action='buy'){
  const input=tradeInput(body),rpc={slot:100,calls:0,started:Date.now(),accounts:async keys=>keys.map(k=>accounts.get(k.toBase58())??null),latestBlockhash:async()=>({blockhash:OTHER.toBase58(),lastValidBlockHeight:500}),fee:async()=>5000};
  const state=await protocol.loadState(rpc,input),buy=action==='buy',src=buy?NATIVE_MINT:MINT,dst=buy?MINT:NATIVE_MINT,output=100000n,fields=state.variantFields??0;
  const data=Buffer.alloc(39+fields);Buffer.from([187,100,250,204,49,196,175,20]).copy(data);data.writeBigUInt64LE(input.amount,8);data.writeBigUInt64LE(output,16);data.writeUInt16LE(100,24);data.writeUInt16LE(25,26);data.writeUInt32LE(1,30);data[34]=state.variants[0];data.writeUInt16LE(10000,35+fields);data[38+fields]=1;
- const addresses=[USER,getAssociatedTokenAddressSync(src,USER),getAssociatedTokenAddressSync(dst,USER),src,dst,TOKEN_PROGRAM_ID,TOKEN_PROGRAM_ID,JUPITER_PROGRAM,new PublicKey('D8cy77BBepLMngZx6ZukaTff5hCt1HrWyKk3Hnd9oitf'),JUPITER_PROGRAM,FEE_ATA,state.programId,state.marketKey,OTHER,SystemProgram.programId];
- const route={transactionVersion:0,swapMode:'ExactIn',inputMint:src.toBase58(),outputMint:dst.toBase58(),inAmount:String(input.amount),outAmount:String(output),otherAmountThreshold:'99000',slippageBps:100,routePlan:[{percent:100,bps:10000,swapInfo:{ammKey:state.marketKey.toBase58(),label:state.label,inputMint:src.toBase58(),outputMint:dst.toBase58(),inAmount:String(input.amount),outAmount:'100250'}}],swapInstruction:{programId:JUPITER_PROGRAM.toBase58(),accounts:addresses.map((p,i)=>({pubkey:p.toBase58(),isSigner:i===0,isWritable:[1,2,10,12].includes(i)})),data:data.toString('base64')},otherInstructions:[],addressesByLookupTableAddress:{}};
+ // Same pool position as the pinned official SDK swap account lists and captured mainnet routes.
+ const poolIndex=meteora?(graduated?13:14):(graduated?15:16);
+ const addresses=[USER,getAssociatedTokenAddressSync(src,USER),getAssociatedTokenAddressSync(dst,USER),src,dst,TOKEN_PROGRAM_ID,TOKEN_PROGRAM_ID,JUPITER_PROGRAM,new PublicKey('D8cy77BBepLMngZx6ZukaTff5hCt1HrWyKk3Hnd9oitf'),JUPITER_PROGRAM,FEE_ATA,state.programId,...Array(6).fill(OTHER)];
+ addresses[poolIndex]=state.marketKey;
+ const route={transactionVersion:0,swapMode:'ExactIn',inputMint:src.toBase58(),outputMint:dst.toBase58(),inAmount:String(input.amount),outAmount:String(output),otherAmountThreshold:'99000',slippageBps:100,routePlan:[{percent:100,bps:10000,swapInfo:{ammKey:state.marketKey.toBase58(),label:state.label,inputMint:src.toBase58(),outputMint:dst.toBase58(),inAmount:String(input.amount),outAmount:'100250'}}],swapInstruction:{programId:JUPITER_PROGRAM.toBase58(),accounts:addresses.map((p,i)=>({pubkey:p.toBase58(),isSigner:i===0,isWritable:[1,2,10,poolIndex].includes(i)})),data:data.toString('base64')},otherInstructions:[],addressesByLookupTableAddress:{}};
  rpc.simulate=async tx=>{
   const fee=feeFor(buy?input.amount:100250n),account=tokenInfo(NATIVE_MINT,FEE_RECIPIENT,fee),message=VersionedTransaction.deserialize(Buffer.from(tx,'base64')).message;
   const index=message.compiledInstructions.findIndex(ix=>message.staticAccountKeys[ix.programIdIndex].equals(JUPITER_PROGRAM)),event=Buffer.alloc(132);Buffer.from('e445a52e51cb9a1d982f4eebc0606e6a','hex').copy(event);event.writeUInt32LE(1,16);src.toBuffer().copy(event,20);event.writeBigUInt64LE(buy?input.amount-fee:input.amount,52);dst.toBuffer().copy(event,60);event.writeBigUInt64LE(buy?output:100250n,92);state.programId.toBuffer().copy(event,100);
@@ -49,3 +52,21 @@ test('wrong owner, discriminator and destination pool fail validation',async()=>
 test('simulation and caller fee ceiling are enforced before network work',async()=>{const f=await fixture();for(const body of [{...f.body,simulate:false},{...f.body,maxServiceFeeBps:24},{...f.body,amount:'-1'},{...f.body,privateKey:'never'}])await assert.rejects(()=>jupiterTrade(body,{},true,()=>{throw Error('network must not run');}),e=>['SIMULATION_REQUIRED','FEE_LIMIT_EXCEEDED','INVALID_INPUT'].includes(e.code));});
 test('existing wrapped SOL is preserved and arbitrary upstream setup is ignored',async()=>{const f=await fixture();f.route.setupInstructions=[{programId:SystemProgram.programId.toBase58(),data:'bad'}];const b=composeRoute(auditRoute(f.route,f.input,f.state),f.input,f.state,true,true,OTHER.toBase58(),[]),tx=VersionedTransaction.deserialize(Buffer.from(b.transaction,'base64'));assert.equal(tx.message.compiledInstructions.filter(ix=>tx.message.staticAccountKeys[ix.programIdIndex].equals(TOKEN_PROGRAM_ID)&&ix.data[0]===9).length,0);});
 test('RPC forbids broadcasts and rejects regressed context',async()=>{const rpc=new Rpc({},async()=>new Response(JSON.stringify({jsonrpc:'2.0',id:1,result:{context:{slot:1},value:[]}})));await assert.rejects(()=>rpc.call('sendTransaction',[]),/Forbidden/);rpc.slot=2;rpc.calls=0;await assert.rejects(()=>rpc.accounts([]),e=>e.code==='RPC_UNAVAILABLE');});
+
+test('verified pool cannot be moved to an unused route account to hide another execution pool',async()=>{
+ for(const graduated of [false,true])for(const action of ['buy','sell']){
+  const f=await fixture(graduated,action);
+  for(const variant of f.state.variants){
+   const good=structuredClone(f.route);
+   const bytes=Buffer.from(good.swapInstruction.data,'base64');bytes[34]=variant;good.swapInstruction.data=bytes.toString('base64');
+   assert.doesNotThrow(()=>auditRoute(good,f.input,f.state));
+   const poolIndex=good.swapInstruction.accounts.findIndex(a=>a.pubkey===f.state.marketKey.toBase58());
+   const tampered=structuredClone(good);
+   tampered.swapInstruction.accounts.push({...tampered.swapInstruction.accounts[poolIndex]});
+   tampered.swapInstruction.accounts[poolIndex].pubkey=OTHER.toBase58();
+   assert.throws(()=>auditRoute(tampered,f.input,f.state),e=>e.code==='ROUTE_REJECTED');
+   const readOnly=structuredClone(good);readOnly.swapInstruction.accounts[poolIndex].isWritable=false;
+   assert.throws(()=>auditRoute(readOnly,f.input,f.state),e=>e.code==='ROUTE_REJECTED');
+  }
+ }
+});

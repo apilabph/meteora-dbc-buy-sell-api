@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-10-13T12:48:47.083Z",
+  "origin": "https://meteora-dbc-trade.apilabph.workers.dev",
+  "scope": "Read-only HTTP checks and unsigned simulation only; public historical holder samples, no signing/broadcast/funds moved",
+  "rows": [
+    {
+      "label": "health",
+      "status": 200,
+      "milliseconds": 97,
+      "check": "passed"
+    },
+    {
+      "label": "capabilities",
+      "status": 200,
+      "milliseconds": 13,
+      "fundedTradesTested": false,
+      "check": "passed"
+    },
+    {
+      "label": "verified-buy.json unsigned readback",
+      "status": 200,
+      "milliseconds": 583,
+      "venue": "meteora-damm-v2",
+      "simulation": {
+        "status": "passed",
+        "contextSlot": 456447807,
+        "unitsConsumed": 70519,
+        "signatureVerification": false,
+        "serviceFeeLamports": "250"
+      },
+      "unsigned": true,
+      "submitted": false,
+      "check": "passed"
+    }
+  ]
+}

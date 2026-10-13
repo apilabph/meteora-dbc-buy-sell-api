@@ -19,3 +19,11 @@ Final hosted readback after the packaging correction passed an unsigned buy simu
 ## Developer website — local review, October 13, 2026
 
 Added a separate, responsive developer website under website/. It is committed for local review, with no deployment or custom domain change. See [website guide](WEBSITE.md) for local startup, screenshots, tests and the production integration still needed. Existing on-chain readiness and funded-test limitations remain in force.
+
+## Follow-up review deployment - October 13, 2026
+
+Deployed the reviewed backend fixes as Worker version 6d988fb6-afa2-40ea-874e-a6ad32ee99e1. Existing runtime configuration was preserved. See [review findings](REVIEW.md#follow-up-review---october-13-2026) and [post-deployment readback](evidence/review-readback-20261013.json).
+
+The updated pool-position guard passed hosted unsigned buy simulations for meteora-damm-v2 at slot 456447807. These were public-holder simulations with no signatures or broadcast. They do not establish funded trading or every stage/direction in this new readback.
+
+The redesigned website remains local-only. No domains, RPC subscriptions, wallet funding, swaps, bridges, contract deployments or live trades were purchased or executed. Funded tests and the remaining setup prerequisites still apply.
