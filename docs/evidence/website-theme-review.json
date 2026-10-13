@@ -1,10 +1,10 @@
 {
-  "checkedAt": "2026-10-13T12:25:18.914Z",
+  "checkedAt": "2026-10-13T13:06:19.598Z",
   "scope": "Local Edge computed-color samples and responsive layout checks; not a complete accessibility audit.",
   "results": [
     {
       "api": "meteora-dbc-buy-sell-api",
-      "textSamples": 83,
+      "textSamples": 87,
       "minimumTextRatio": 6.39,
       "failures": [],
       "inputBorderRatio": 3.76,
