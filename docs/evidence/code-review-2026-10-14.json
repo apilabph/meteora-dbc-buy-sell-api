@@ -37,7 +37,7 @@
       "logSha256": "e458541ad4f1938c7ac3ebd9b0c65953051be5bd9df693cb653ae22f952753d3"
     }
   ],
-  "scope": "Internal source review and offline regression/contract-fixture checks. No live chain request, wallet access, transaction signing/broadcast, funded trade or Worker deployment.",
+  "scope": "Internal source review and offline regression/contract-fixture checks. No live chain request, access to user wallets, live transaction signing/broadcast, funded trade or Worker deployment. Tests may create signatures using synthetic fixture keys only.",
   "compatibility": "Executable token-mint accounts rejected.",
   "customerRpcOnly": true,
   "rapidApiChanged": false,
